@@ -3,7 +3,10 @@
 // are changed infrequently
 #pragma once
 
+#include "FileInput.hpp"
 #include "InputInterface.hpp"
 
 #include "Channel.hpp"
 #include "ChannelManager.hpp"
+
+#include "InputWatcher.hpp"

@@ -22,12 +22,15 @@ namespace Logic
 				_inputs = gcnew List<Inputs::InputInterface^>();
 			}
 			
+			void appendInput(Inputs::InputInterface^ in);
+			void removeInput(String^ name);
+			
 			// Name accessor.
 			String^	%Name();
 		
 		protected:
 			String^ _name;
-			List<Inputs::InputInterface^>^ _inputs;
+			List<Inputs::InputInterface^>^ _inputs;			
 	};
 	
 }

@@ -24,6 +24,22 @@ namespace Logic
 			void appendChannel(Channel^ toAppend);
 			void removeChannel(String^ nameToDelete);
 			
+			Channel^ operator[] (int idx)	{ return _channels[idx]; }
+			Channel^ operator[] (String^ name)	
+			{ 
+				Channel^ iter;
+				for each(Channel^ chan in _channels)
+				{
+					if (chan->Name() == name)
+					{
+						iter = chan;
+						break;
+					}
+				}
+				
+				return iter;
+			}
+			
 		private:
 			List<Channel^>^ _channels;
 	};

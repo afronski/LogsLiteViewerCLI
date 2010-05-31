@@ -7,3 +7,23 @@ String^% Channel::Name()
 {
 	return _name;
 }
+
+void Channel::appendInput(Inputs::InputInterface^ in)
+{
+	_inputs->Add(in);
+}
+
+void Channel::removeInput(String^ name)
+{
+	Inputs::InputInterface^ iter;
+	for each(Inputs::InputInterface^ i in _inputs)
+	{
+		if (i->Name() == name)
+		{
+			iter = i;
+			break;
+		}			
+	}
+	
+	_inputs->Remove(iter);
+}

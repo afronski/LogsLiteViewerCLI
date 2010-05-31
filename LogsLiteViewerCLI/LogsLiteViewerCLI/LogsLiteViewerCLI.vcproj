@@ -208,6 +208,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileInput.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InputWatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LogsLiteViewerCLI.cpp"
 				>
 			</File>

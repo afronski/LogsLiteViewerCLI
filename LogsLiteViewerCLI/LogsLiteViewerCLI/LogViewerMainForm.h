@@ -29,12 +29,10 @@ namespace LogsLiteViewerCLI
 				delete components;
 			}
 		}
-	private: System::IO::FileSystemWatcher^  FileSystemWatcher;
+
 	private: System::Windows::Forms::TabControl^  MainTabs;
 	private: System::Windows::Forms::TabPage^  SampleView;
-
-
-
+	
 	private: System::Windows::Forms::ToolStrip^  MainToolbar;
 
 	private: System::Windows::Forms::MenuStrip^  MainMenu;
@@ -61,19 +59,7 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::FolderBrowserDialog^  FolderBrowserDialog;
 	private: System::Windows::Forms::ListBox^  MainChangeSink;
 
-
 	private: System::ComponentModel::IContainer^  components;
-
-
-
-	protected: 
-
-	protected: 
-
-
-	protected: 
-
-
 
 	private:
 		/// <summary>
@@ -90,7 +76,6 @@ namespace LogsLiteViewerCLI
 		{
 			this->components = (gcnew System::ComponentModel::Container());
 			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(LogViewerMainForm::typeid));
-			this->FileSystemWatcher = (gcnew System::IO::FileSystemWatcher());
 			this->MainTabs = (gcnew System::Windows::Forms::TabControl());
 			this->SampleView = (gcnew System::Windows::Forms::TabPage());
 			this->MainChangeSink = (gcnew System::Windows::Forms::ListBox());
@@ -116,20 +101,11 @@ namespace LogsLiteViewerCLI
 			this->createChannelStripButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->NotifyIcon = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			this->FolderBrowserDialog = (gcnew System::Windows::Forms::FolderBrowserDialog());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->FileSystemWatcher))->BeginInit();
 			this->MainTabs->SuspendLayout();
 			this->SampleView->SuspendLayout();
 			this->MainMenu->SuspendLayout();
 			this->MainToolbar->SuspendLayout();
 			this->SuspendLayout();
-			// 
-			// FileSystemWatcher
-			// 
-			this->FileSystemWatcher->EnableRaisingEvents = true;
-			this->FileSystemWatcher->IncludeSubdirectories = true;
-			this->FileSystemWatcher->NotifyFilter = System::IO::NotifyFilters::LastAccess;
-			this->FileSystemWatcher->SynchronizingObject = this;
-			this->FileSystemWatcher->Changed += gcnew System::IO::FileSystemEventHandler(this, &LogViewerMainForm::FileSystemWatcher_Changed);
 			// 
 			// MainTabs
 			// 
@@ -325,7 +301,6 @@ namespace LogsLiteViewerCLI
 			this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
 			this->Text = L"LogLiteViewer.CLI";
 			this->Load += gcnew System::EventHandler(this, &LogViewerMainForm::LogViewerMainForm_Load);
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->FileSystemWatcher))->EndInit();
 			this->MainTabs->ResumeLayout(false);
 			this->SampleView->ResumeLayout(false);
 			this->MainMenu->ResumeLayout(false);
@@ -347,7 +322,7 @@ namespace LogsLiteViewerCLI
 		System::Void LogViewerMainForm_Load(System::Object^  sender, System::EventArgs^  e) 
 		{
 			channelsManager = gcnew ChannelManager();								
-			channelsManager->appendChannel(gcnew Channel(MainTabs->TabPages[0]->Name));
+			channelsManager->appendChannel(gcnew Channel(MainTabs->TabPages[0]->Name));			
 		}
 		
 	private:   
@@ -382,7 +357,15 @@ namespace LogsLiteViewerCLI
 			Close();	
 		}			
 	
-	private: 
+	public:
+		delegate void DelegateAddItemToListBox(ListBox^ lb, String^ item);
+		
+		void AddItemToListBox(ListBox^ lb, String^ item)
+		{
+			lb->Items->Add(item);
+		}
+	
+	private:			 
 		System::Void FileSystemWatcher_Changed(System::Object^  sender, System::IO::FileSystemEventArgs^  e) 
 		{			
 			System::String^ str = "";
@@ -397,18 +380,17 @@ namespace LogsLiteViewerCLI
 					break;					
 			}
 			
-			MainChangeSink->Items->Add(e->FullPath + ": " + str);
-		}		 
+			MainChangeSink->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddItemToListBox), MainChangeSink, e->Name + ": " + str);
+		}		 			
 		
 	private:
 		System::Void JoinLogic()
 		{
 			if (FolderBrowserDialog->ShowDialog(this) == System::Windows::Forms::DialogResult::OK)
 			{
-				FileSystemWatcher->Path = FolderBrowserDialog->SelectedPath;
-				FileSystemWatcher->NotifyFilter =  static_cast<NotifyFilters>(NotifyFilters::LastAccess | NotifyFilters::LastWrite | NotifyFilters::FileName | NotifyFilters::DirectoryName);				
-				FileSystemWatcher->Filter = "*.*";				
-				FileSystemWatcher->EnableRaisingEvents = true;
+				channelsManager[MainTabs->TabIndex]->appendInput(gcnew Inputs::FileInput(FolderBrowserDialog->SelectedPath, 
+																 InputWatcher::FileType::FileType_Txt, 
+																 gcnew System::IO::FileSystemEventHandler(this, &LogViewerMainForm::FileSystemWatcher_Changed)));
 			}
 		}			
 		
