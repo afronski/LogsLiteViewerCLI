@@ -9,6 +9,9 @@ namespace Logic
 
 	public ref class InputWatcher
 	{
+		public:
+			delegate System::Void ProxyFileSystemDelegate(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e);
+	
 		public:		
 			enum class FileType
 			{
@@ -21,18 +24,34 @@ namespace Logic
 			~InputWatcher() 
 			{
 				_fileWatcher->Changed -= _eventHandler;
+				this->ProxyFileSystemEvent -= _additionalEventHandler;
 			}
 			
 			// Create method.
-			void createNewWatcher(String^ path, InputWatcher::FileType ft, bool activateNow, System::IO::FileSystemEventHandler^ eventHandler);
+			void createNewWatcher(String^ path, InputWatcher::FileType ft, unsigned int idx, bool activateNow, ProxyFileSystemDelegate^ eventHandler);
 			
 			// Watcher state management methods.
 			void suspendWatcher();
-			void resumeWatcher();
+			void resumeWatcher();			
+			
+		public:
+			event ProxyFileSystemDelegate^ ProxyFileSystemEvent;
 			
 		private:
+			System::Void ProxyFileSystemDelgateImpl(System::Object^  sender, System::IO::FileSystemEventArgs^  e)
+			{			
+				if (e->ChangeType == System::IO::WatcherChangeTypes::Changed)
+				{		
+					ProxyFileSystemEvent(sender, gcnew LogViewer::Events::SimpleChangedDataEventArgs(_tabIndex, e->FullPath));
+				}
+			}
+			
+		private:
+			unsigned int _tabIndex;
+		
 			FileSystemWatcher^ _fileWatcher;
 			System::IO::FileSystemEventHandler^ _eventHandler;
+			ProxyFileSystemDelegate^ _additionalEventHandler;
 	};
 	
 }

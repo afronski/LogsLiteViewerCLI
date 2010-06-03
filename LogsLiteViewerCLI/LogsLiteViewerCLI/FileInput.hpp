@@ -16,10 +16,12 @@ namespace Inputs
 	{
 		public:
 			FileInput();
-			FileInput(String^ path, InputWatcher::FileType ft, System::IO::FileSystemEventHandler^ eventHandler);
-			~FileInput() {}		
+			FileInput(String^ path, InputWatcher::FileType ft, unsigned int idx, InputWatcher::ProxyFileSystemDelegate^ eventHandler);
+			virtual ~FileInput() {}		
 			
 		private:
+			unsigned int _tabIndex;
+		
 			String^ _path;			
 			InputWatcher^ _watcher;
 	};

@@ -8,8 +8,9 @@ FileInput::FileInput(): _path("")
 	_watcher = gcnew InputWatcher();
 }
 
-FileInput::FileInput(String^ path, InputWatcher::FileType ft, System::IO::FileSystemEventHandler^ eventHandler): _path(path)
+FileInput::FileInput(String^ path, InputWatcher::FileType ft, unsigned int idx, InputWatcher::ProxyFileSystemDelegate^ eventHandler): 
+	_path(path), _tabIndex(idx)
 {
 	_watcher = gcnew InputWatcher();		
-	_watcher->createNewWatcher(path, ft, true, eventHandler);
+	_watcher->createNewWatcher(path, ft, idx, true, eventHandler);
 }

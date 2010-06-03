@@ -3,8 +3,11 @@
 // are changed infrequently
 #pragma once
 
-#include "FileInput.hpp"
+#include "ChangedDataEvents.hpp"
+
 #include "InputInterface.hpp"
+#include "FileInput.hpp"
+#include "NetworkInput.hpp"
 
 #include "Channel.hpp"
 #include "ChannelManager.hpp"

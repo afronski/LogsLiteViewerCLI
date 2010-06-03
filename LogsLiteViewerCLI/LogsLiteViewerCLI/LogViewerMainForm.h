@@ -2,6 +2,7 @@
 
 namespace LogsLiteViewerCLI 
 {
+
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -31,7 +32,7 @@ namespace LogsLiteViewerCLI
 		}
 
 	private: System::Windows::Forms::TabControl^  MainTabs;
-	private: System::Windows::Forms::TabPage^  SampleView;
+
 	
 	private: System::Windows::Forms::ToolStrip^  MainToolbar;
 
@@ -57,7 +58,7 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::NotifyIcon^  NotifyIcon;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private: System::Windows::Forms::FolderBrowserDialog^  FolderBrowserDialog;
-	private: System::Windows::Forms::ListBox^  MainChangeSink;
+
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -77,8 +78,6 @@ namespace LogsLiteViewerCLI
 			this->components = (gcnew System::ComponentModel::Container());
 			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(LogViewerMainForm::typeid));
 			this->MainTabs = (gcnew System::Windows::Forms::TabControl());
-			this->SampleView = (gcnew System::Windows::Forms::TabPage());
-			this->MainChangeSink = (gcnew System::Windows::Forms::ListBox());
 			this->MainMenu = (gcnew System::Windows::Forms::MenuStrip());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->createChannelToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -101,41 +100,18 @@ namespace LogsLiteViewerCLI
 			this->createChannelStripButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->NotifyIcon = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			this->FolderBrowserDialog = (gcnew System::Windows::Forms::FolderBrowserDialog());
-			this->MainTabs->SuspendLayout();
-			this->SampleView->SuspendLayout();
 			this->MainMenu->SuspendLayout();
 			this->MainToolbar->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// MainTabs
 			// 
-			this->MainTabs->Controls->Add(this->SampleView);
 			this->MainTabs->Dock = System::Windows::Forms::DockStyle::Bottom;
 			this->MainTabs->Location = System::Drawing::Point(0, 52);
 			this->MainTabs->Name = L"MainTabs";
 			this->MainTabs->SelectedIndex = 0;
 			this->MainTabs->Size = System::Drawing::Size(494, 520);
 			this->MainTabs->TabIndex = 0;
-			// 
-			// SampleView
-			// 
-			this->SampleView->Controls->Add(this->MainChangeSink);
-			this->SampleView->Location = System::Drawing::Point(4, 22);
-			this->SampleView->Name = L"SampleView";
-			this->SampleView->Padding = System::Windows::Forms::Padding(3);
-			this->SampleView->Size = System::Drawing::Size(486, 494);
-			this->SampleView->TabIndex = 0;
-			this->SampleView->Text = L"Sample view";
-			this->SampleView->UseVisualStyleBackColor = true;
-			// 
-			// MainChangeSink
-			// 
-			this->MainChangeSink->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->MainChangeSink->FormattingEnabled = true;
-			this->MainChangeSink->Location = System::Drawing::Point(3, 3);
-			this->MainChangeSink->Name = L"MainChangeSink";
-			this->MainChangeSink->Size = System::Drawing::Size(480, 485);
-			this->MainChangeSink->TabIndex = 0;
 			// 
 			// MainMenu
 			// 
@@ -301,8 +277,6 @@ namespace LogsLiteViewerCLI
 			this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
 			this->Text = L"LogLiteViewer.CLI";
 			this->Load += gcnew System::EventHandler(this, &LogViewerMainForm::LogViewerMainForm_Load);
-			this->MainTabs->ResumeLayout(false);
-			this->SampleView->ResumeLayout(false);
 			this->MainMenu->ResumeLayout(false);
 			this->MainMenu->PerformLayout();
 			this->MainToolbar->ResumeLayout(false);
@@ -316,13 +290,17 @@ namespace LogsLiteViewerCLI
 	#pragma region Application logic - Main Window 
 
 	private:		
+		// Global channel manager for window.
 		ChannelManager^ channelsManager;
 
 	private: 
 		System::Void LogViewerMainForm_Load(System::Object^  sender, System::EventArgs^  e) 
 		{
-			channelsManager = gcnew ChannelManager();								
-			channelsManager->appendChannel(gcnew Channel(MainTabs->TabPages[0]->Name));			
+			// Initialize channel manager.
+			channelsManager = gcnew ChannelManager();
+		
+			// Create first channel.
+			CreateChannelLogic();	
 		}
 		
 	private:   
@@ -344,74 +322,126 @@ namespace LogsLiteViewerCLI
 			// Adding channel and page to the page control.
 			MainTabs->TabPages[newPage->Name]->Controls->Add(temp);			
 			channelsManager->appendChannel(gcnew Channel(newName));
-		}
+		}		
 	
-		System::Void createChannelToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-		{			
-			CreateChannelLogic();
-		}
-		
-	private: 		
-		System::Void exitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-		{
-			Close();	
-		}			
+	#pragma region Delegate handlers
 	
 	public:
+		// Adding data to the specified list box - delegate.
 		delegate void DelegateAddItemToListBox(ListBox^ lb, String^ item);
 		
-		void AddItemToListBox(ListBox^ lb, String^ item)
+		// Valid function, for adding data into ListBox from the same thread.
+		void AddValueToListBox(ListBox^ lb, String^ item)
 		{
+			// Add item value into listbox.			
+			lb->Items->Add(item);
+		}		
+		
+		// Valid function, for adding data into ListBox from the same thread.
+		void AddFileChangeToListBox(ListBox^ lb, String^ item)
+		{
+			// Reading from file sent in item parameter, last change and last state.
+			// TODO - Reading files and changes.
 			lb->Items->Add(item);
 		}
-	
-	private:			 
-		System::Void FileSystemWatcher_Changed(System::Object^  sender, System::IO::FileSystemEventArgs^  e) 
+		
+	#pragma endregion
+
+	private:			 	
+		// UdpClient data handler.
+		System::Void UDPData_Received(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e) 
 		{			
-			System::String^ str = "";
-			switch(e->ChangeType)
-			{				
-				case System::IO::WatcherChangeTypes::Changed:
-					str = "Changed";
-					break;
-					
-				default:
-					str = "Unrecognized";
-					break;					
-			}
-			
-			MainChangeSink->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddItemToListBox), MainChangeSink, e->Name + ": " + str);
+			// Decoding Tab and ListBox from index sent to the event.
+			int idx = e->TabIndex();	
+			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];	
+			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddValueToListBox), control, e->Data());
+		}		 				
+	
+	private:			 	
+		// FileSystemWatcher change event handler.
+		System::Void FileSystemWatcher_Changed(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e) 
+		{				
+			// Decoding Tab and ListBox from index sent to the event.
+			int idx = e->TabIndex();
+			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];
+			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddFileChangeToListBox), control, e->Data());			
 		}		 			
 		
-	private:
-		System::Void JoinLogic()
+	private:	
+		System::Void JoinGenericInputLogic()
 		{
+			unsigned int idx = MainTabs->SelectedIndex;
+		
+			// TODO - Dialogs and selection.		
+		
+			// Selecting type of input.			
+			JoinNetworkLogic("http://localhost/", 666, idx);			
+			
+			// If it's file input - select file type.
+			// Join xml input.
+			JoinFileInputLogic(InputWatcher::FileType::FileType_Xml, idx);
+			
+			// Join txt input.
+			JoinFileInputLogic(InputWatcher::FileType::FileType_Txt, idx);
+		}
+	
+	private:
+		System::Void JoinNetworkLogic(System::String^ address, unsigned int port, unsigned int idx)
+		{
+			// Adding new input into channels manager.			
+			Inputs::NetworkInput^ networkInput = gcnew Inputs::NetworkInput(address, port, idx);
+			networkInput->OnReceived += gcnew Inputs::NetworkInput::ReceivedDelegate(this, &LogViewerMainForm::UDPData_Received);
+			
+			channelsManager[MainTabs->TabIndex]->appendInput(networkInput);
+		}
+	
+	private:			
+		System::Void JoinFileInputLogic(InputWatcher::FileType ft, unsigned int idx)
+		{
+			// Joining new file input into active channel.
 			if (FolderBrowserDialog->ShowDialog(this) == System::Windows::Forms::DialogResult::OK)
-			{
-				channelsManager[MainTabs->TabIndex]->appendInput(gcnew Inputs::FileInput(FolderBrowserDialog->SelectedPath, 
-																 InputWatcher::FileType::FileType_Txt, 
-																 gcnew System::IO::FileSystemEventHandler(this, &LogViewerMainForm::FileSystemWatcher_Changed)));
+			{				
+				InputWatcher::ProxyFileSystemDelegate^ eventHandler = gcnew InputWatcher::ProxyFileSystemDelegate(this, &LogViewerMainForm::FileSystemWatcher_Changed);
+				channelsManager[MainTabs->TabIndex]->appendInput(gcnew Inputs::FileInput(FolderBrowserDialog->SelectedPath, ft, idx, eventHandler));
 			}
 		}			
 		
 	private: 
 		System::Void joinToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 		{
-			JoinLogic();
+			// Join input.
+			JoinGenericInputLogic();
 		}
 						
 	private: 
 		System::Void joinStripButton_Click(System::Object^  sender, System::EventArgs^  e) 
 		{
-			JoinLogic();
+			// Join input.
+			JoinGenericInputLogic();
 		}
 							
 	private: 
 		System::Void createChannelStripButton_Click(System::Object^  sender, System::EventArgs^  e) 
 		{
+			// Create channel.
 			CreateChannelLogic();
 		}
+		
+	private:  
+		System::Void createChannelToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		{		
+			// Create channel	
+			CreateChannelLogic();
+		}
+		
+	private: 		
+		System::Void exitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			// Closing form.
+			Close();	
+		}			
 			 
 	#pragma endregion		 		 
 };
+
 }

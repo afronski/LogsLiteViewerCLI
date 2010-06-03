@@ -2,7 +2,7 @@
 
 using namespace LogViewer::Logic;
 
-void InputWatcher::createNewWatcher(String^ path, InputWatcher::FileType ft, bool activateNow, System::IO::FileSystemEventHandler^ eventHandler)
+void InputWatcher::createNewWatcher(String^ path, InputWatcher::FileType ft, unsigned int idx, bool activateNow, ProxyFileSystemDelegate^ eventHandler)
 {
 	String^ filter;
 
@@ -17,12 +17,17 @@ void InputWatcher::createNewWatcher(String^ path, InputWatcher::FileType ft, boo
 			break;
 	}
 	
-	_eventHandler = eventHandler;
+	_tabIndex = idx;
+	
+	_additionalEventHandler = eventHandler;		
+	this->ProxyFileSystemEvent += _additionalEventHandler;
+	
+	_eventHandler = gcnew System::IO::FileSystemEventHandler(this, &InputWatcher::ProxyFileSystemDelgateImpl);
 
 	_fileWatcher = gcnew FileSystemWatcher(path, filter);
-	_fileWatcher->EnableRaisingEvents = activateNow;
-	_fileWatcher->NotifyFilter = System::IO::NotifyFilters::LastWrite;
 	_fileWatcher->Changed += _eventHandler;
+	_fileWatcher->EnableRaisingEvents = activateNow;
+	_fileWatcher->NotifyFilter = System::IO::NotifyFilters::Attributes | System::IO::NotifyFilters::LastAccess | System::IO::NotifyFilters::LastAccess;	
 }			
 
 void InputWatcher::suspendWatcher()
