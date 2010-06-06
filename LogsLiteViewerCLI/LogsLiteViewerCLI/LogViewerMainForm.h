@@ -1,6 +1,8 @@
 #pragma once
 
 #include "About.h"
+#include "InputTypeDialog.h"
+#include "UdpPropertiesDialog.h"
 
 namespace LogsLiteViewerCLI 
 {
@@ -98,9 +100,9 @@ namespace LogsLiteViewerCLI
 			this->joinStripButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->toolStripSeparator1 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->createChannelStripButton = (gcnew System::Windows::Forms::ToolStripButton());
+			this->manageChannelsButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->NotifyIcon = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			this->FolderBrowserDialog = (gcnew System::Windows::Forms::FolderBrowserDialog());
-			this->manageChannelsButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->MainMenu->SuspendLayout();
 			this->MainToolbar->SuspendLayout();
 			this->SuspendLayout();
@@ -179,6 +181,7 @@ namespace LogsLiteViewerCLI
 			this->splitChannelToolStripMenuItem->Name = L"splitChannelToolStripMenuItem";
 			this->splitChannelToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->splitChannelToolStripMenuItem->Text = L"&Split channel";
+			this->splitChannelToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::splitChannelToolStripMenuItem_Click);
 			// 
 			// aToolStripMenuItem
 			// 
@@ -186,6 +189,7 @@ namespace LogsLiteViewerCLI
 			this->aToolStripMenuItem->Name = L"aToolStripMenuItem";
 			this->aToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->aToolStripMenuItem->Text = L" &Tie channels";
+			this->aToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::aToolStripMenuItem_Click);
 			// 
 			// toolStripMenuItem4
 			// 
@@ -198,6 +202,7 @@ namespace LogsLiteViewerCLI
 			this->manageChannelsToolStripMenuItem->Name = L"manageChannelsToolStripMenuItem";
 			this->manageChannelsToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->manageChannelsToolStripMenuItem->Text = L"&Manage channels...";
+			this->manageChannelsToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::manageChannelsToolStripMenuItem_Click);
 			// 
 			// helpToolStripMenuItem
 			// 
@@ -211,7 +216,7 @@ namespace LogsLiteViewerCLI
 			// 
 			this->aboutToolStripMenuItem1->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"aboutToolStripMenuItem1.Image")));
 			this->aboutToolStripMenuItem1->Name = L"aboutToolStripMenuItem1";
-			this->aboutToolStripMenuItem1->Size = System::Drawing::Size(152, 22);
+			this->aboutToolStripMenuItem1->Size = System::Drawing::Size(107, 22);
 			this->aboutToolStripMenuItem1->Text = L"&About";
 			this->aboutToolStripMenuItem1->Click += gcnew System::EventHandler(this, &LogViewerMainForm::aboutToolStripMenuItem1_Click);
 			// 
@@ -252,10 +257,6 @@ namespace LogsLiteViewerCLI
 			this->createChannelStripButton->ToolTipText = L"Click here to create channel...";
 			this->createChannelStripButton->Click += gcnew System::EventHandler(this, &LogViewerMainForm::createChannelStripButton_Click);
 			// 
-			// NotifyIcon
-			// 
-			this->NotifyIcon->Visible = true;
-			// 
 			// manageChannelsButton
 			// 
 			this->manageChannelsButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Image;
@@ -265,6 +266,15 @@ namespace LogsLiteViewerCLI
 			this->manageChannelsButton->Size = System::Drawing::Size(23, 22);
 			this->manageChannelsButton->Text = L"manageChannelsButton";
 			this->manageChannelsButton->ToolTipText = L"Click to manage channels...";
+			this->manageChannelsButton->Click += gcnew System::EventHandler(this, &LogViewerMainForm::manageChannelsButton_Click);
+			// 
+			// NotifyIcon
+			// 
+			this->NotifyIcon->BalloonTipIcon = System::Windows::Forms::ToolTipIcon::Info;
+			this->NotifyIcon->BalloonTipText = L"Your input was changed...\r\n";
+			this->NotifyIcon->BalloonTipTitle = L"New Information...";
+			this->NotifyIcon->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"NotifyIcon.Icon")));
+			this->NotifyIcon->Visible = true;
 			// 
 			// LogViewerMainForm
 			// 
@@ -354,6 +364,20 @@ namespace LogsLiteViewerCLI
 		
 	#pragma endregion
 
+	private:
+		// App notifies user, when something hit, and when window is minimized.
+		System::Void Notify(System::String^ value, unsigned int tabIdx)
+		{
+			if (this->WindowState == Windows::Forms::FormWindowState::Minimized)
+			{
+				System::String^ oldVal = NotifyIcon->BalloonTipText;
+				NotifyIcon->BalloonTipText += String::Format("Tab {1} caught value: \n'{0}' \n", value->Substring(0, 12) + "..." , tabIdx);
+				NotifyIcon->ShowBalloonTip(2000);
+				
+				NotifyIcon->BalloonTipText = oldVal;
+			}
+		}
+
 	private:			 	
 		// UdpClient data handler.
 		System::Void UDPData_Received(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e) 
@@ -362,6 +386,7 @@ namespace LogsLiteViewerCLI
 			int idx = e->TabIndex();	
 			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];	
 			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddValueToListBox), control, e->Data());
+			Notify(e->Data(), e->TabIndex());
 		}		 				
 	
 	private:			 	
@@ -372,24 +397,45 @@ namespace LogsLiteViewerCLI
 			int idx = e->TabIndex();
 			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];
 			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddFileChangeToListBox), control, e->Data());			
-		}		 			
+			Notify(e->Data(), e->TabIndex());
+		}		
+		
+	private:
+		// Showing manage channels dialog.
+		System::Void ShowManageChannelsDialog()
+		{
+			// TODO
+		}		
 		
 	private:	
 		System::Void JoinGenericInputLogic()
 		{
 			unsigned int idx = MainTabs->SelectedIndex;
-		
-			// TODO - Dialogs and selection.		
-		
-			// Selecting type of input.			
-			JoinNetworkLogic("http://localhost/", 666, idx);			
-			
-			// If it's file input - select file type.
-			// Join xml input.
-			JoinFileInputLogic(InputWatcher::FileType::FileType_Xml, idx);
-			
-			// Join txt input.
-			JoinFileInputLogic(InputWatcher::FileType::FileType_Txt, idx);
+			InputTypeDialog^ window = gcnew InputTypeDialog();
+
+			if (window->ShowDialog(this) == Windows::Forms::DialogResult::OK)
+			{		
+				if (window->cbxType->SelectedItem->ToString()->Contains("UDP"))
+				{
+					// Selecting type of input.			
+					UdpPropertiesDialog^ dialog = gcnew UdpPropertiesDialog();
+					
+					if (dialog->ShowDialog(this) == Windows::Forms::DialogResult::OK)
+					{					
+						JoinNetworkLogic(dialog->tbAddress->Text, static_cast<unsigned int>(dialog->nmPort->Value), idx);			
+					}
+				}
+				else if (window->cbxType->SelectedItem->ToString()->Contains("XML"))
+				{
+					// Join xml input.
+					JoinFileInputLogic(InputWatcher::FileType::FileType_Xml, idx);
+				}
+				else
+				{	
+					// Join txt input.
+					JoinFileInputLogic(InputWatcher::FileType::FileType_Txt, idx);
+				}		
+			}
 		}
 	
 	private:
@@ -405,7 +451,7 @@ namespace LogsLiteViewerCLI
 	private:			
 		System::Void JoinFileInputLogic(InputWatcher::FileType ft, unsigned int idx)
 		{
-			// Joining new file input into active channel.
+			// Joining new file input into active channel.			
 			if (FolderBrowserDialog->ShowDialog(this) == System::Windows::Forms::DialogResult::OK)
 			{				
 				InputWatcher::ProxyFileSystemDelegate^ eventHandler = gcnew InputWatcher::ProxyFileSystemDelegate(this, &LogViewerMainForm::FileSystemWatcher_Changed);
@@ -454,8 +500,33 @@ namespace LogsLiteViewerCLI
 			About^ AboutWindow = gcnew About();
 			AboutWindow->Show(this);
 		}
+			
+	private: 
+		System::Void splitChannelToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			// TODO
+		}
 		
-	#pragma endregion			
+	private: 
+		System::Void aToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			// TODO
+		}
+		
+		
+	private: 
+		System::Void manageChannelsToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			ShowManageChannelsDialog();
+		}
+		
+	private: 
+		System::Void manageChannelsButton_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			ShowManageChannelsDialog();
+		}
+			
+	#pragma endregion						
 };
 
 }

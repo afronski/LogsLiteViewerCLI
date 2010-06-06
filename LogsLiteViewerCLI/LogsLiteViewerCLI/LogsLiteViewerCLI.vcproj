@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InputTypeDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\InputWatcher.cpp"
 				>
 			</File>
@@ -246,6 +250,10 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\UdpPropertiesDialog.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -283,6 +291,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InputTypeDialog.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\InputTypeDialog.resx"
+					>
+				</File>
+			</File>
+			<File
 				RelativePath=".\InputWatcher.hpp"
 				>
 			</File>
@@ -307,6 +324,15 @@
 			<File
 				RelativePath=".\stdafx.h"
 				>
+			</File>
+			<File
+				RelativePath=".\UdpPropertiesDialog.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\UdpPropertiesDialog.resx"
+					>
+				</File>
 			</File>
 		</Filter>
 		<Filter
