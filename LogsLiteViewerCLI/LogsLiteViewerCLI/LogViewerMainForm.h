@@ -363,7 +363,8 @@ namespace LogsLiteViewerCLI
 		void AddValueToListBox(ListBox^ lb, String^ item)
 		{
 			// Add item value into listbox.			
-			lb->Items->Add(item);
+			lb->Items->Add(item);			
+			lb->TopIndex = lb->Items->Count - 1;	
 		}		
 		
 		// Valid function, for adding data into ListBox from the same thread.
