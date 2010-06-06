@@ -29,6 +29,24 @@ namespace Logic
 			
 			// Name accessor.
 			String^	%Name();
+			
+			unsigned int inputsCount()		{ return _inputs->Count; }
+
+			Inputs::InputInterface^ operator[] (int idx)	{ return _inputs[idx]; }
+			Inputs::InputInterface^ operator[] (String^ name)	
+			{ 
+				Inputs::InputInterface^ iter;
+				for each(Inputs::InputInterface^ i in _inputs)
+				{
+					if (i->Name() == name)
+					{
+						iter = i;
+						break;
+					}
+				}
+				
+				return iter;
+			}				
 		
 		protected:
 			String^ _name;

@@ -9,13 +9,15 @@ namespace Logic
 namespace Inputs
 {	
 
-	public ref class InputInterface
+	public ref class InputInterface abstract
 	{
 		public:
 			InputInterface(): _name("") {}
 			InputInterface(String^ name): _name(name) {}						
 			
 			virtual ~InputInterface() {}						
+			
+			virtual String^ Type() abstract;
 			
 			// Public accessor.
 			String^% Name()

@@ -56,13 +56,16 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::ToolStripMenuItem^  createChannelToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem3;
 	private: System::Windows::Forms::ToolStripMenuItem^  splitChannelToolStripMenuItem;
-	private: System::Windows::Forms::ToolStripMenuItem^  aToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  tieToolStripMenuItem;
+
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem4;
 	private: System::Windows::Forms::ToolStripMenuItem^  manageChannelsToolStripMenuItem;
 	private: System::Windows::Forms::NotifyIcon^  NotifyIcon;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private: System::Windows::Forms::FolderBrowserDialog^  FolderBrowserDialog;
 	private: System::Windows::Forms::ToolStripButton^  manageChannelsButton;
+	public: System::ComponentModel::BackgroundWorker^  udpWorker;
+	private: 
 
 
 	private: System::ComponentModel::IContainer^  components;
@@ -92,7 +95,7 @@ namespace LogsLiteViewerCLI
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->editToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->splitChannelToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->aToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->tieToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->toolStripMenuItem4 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->manageChannelsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->helpToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -104,6 +107,7 @@ namespace LogsLiteViewerCLI
 			this->manageChannelsButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->NotifyIcon = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			this->FolderBrowserDialog = (gcnew System::Windows::Forms::FolderBrowserDialog());
+			this->udpWorker = (gcnew System::ComponentModel::BackgroundWorker());
 			this->MainMenu->SuspendLayout();
 			this->MainToolbar->SuspendLayout();
 			this->SuspendLayout();
@@ -114,7 +118,7 @@ namespace LogsLiteViewerCLI
 			this->MainTabs->Location = System::Drawing::Point(0, 52);
 			this->MainTabs->Name = L"MainTabs";
 			this->MainTabs->SelectedIndex = 0;
-			this->MainTabs->Size = System::Drawing::Size(494, 520);
+			this->MainTabs->Size = System::Drawing::Size(694, 520);
 			this->MainTabs->TabIndex = 0;
 			// 
 			// MainMenu
@@ -123,7 +127,7 @@ namespace LogsLiteViewerCLI
 				this->editToolStripMenuItem, this->helpToolStripMenuItem});
 			this->MainMenu->Location = System::Drawing::Point(0, 0);
 			this->MainMenu->Name = L"MainMenu";
-			this->MainMenu->Size = System::Drawing::Size(494, 24);
+			this->MainMenu->Size = System::Drawing::Size(694, 24);
 			this->MainMenu->TabIndex = 1;
 			this->MainMenu->Text = L"menuStrip1";
 			// 
@@ -171,7 +175,7 @@ namespace LogsLiteViewerCLI
 			// editToolStripMenuItem
 			// 
 			this->editToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->splitChannelToolStripMenuItem, 
-				this->aToolStripMenuItem, this->toolStripMenuItem4, this->manageChannelsToolStripMenuItem});
+				this->tieToolStripMenuItem, this->toolStripMenuItem4, this->manageChannelsToolStripMenuItem});
 			this->editToolStripMenuItem->Name = L"editToolStripMenuItem";
 			this->editToolStripMenuItem->Size = System::Drawing::Size(39, 20);
 			this->editToolStripMenuItem->Text = L"&Edit";
@@ -184,13 +188,13 @@ namespace LogsLiteViewerCLI
 			this->splitChannelToolStripMenuItem->Text = L"&Split channel";
 			this->splitChannelToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::splitChannelToolStripMenuItem_Click);
 			// 
-			// aToolStripMenuItem
+			// tieToolStripMenuItem
 			// 
-			this->aToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"aToolStripMenuItem.Image")));
-			this->aToolStripMenuItem->Name = L"aToolStripMenuItem";
-			this->aToolStripMenuItem->Size = System::Drawing::Size(176, 22);
-			this->aToolStripMenuItem->Text = L" &Tie channels";
-			this->aToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::aToolStripMenuItem_Click);
+			this->tieToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"tieToolStripMenuItem.Image")));
+			this->tieToolStripMenuItem->Name = L"tieToolStripMenuItem";
+			this->tieToolStripMenuItem->Size = System::Drawing::Size(176, 22);
+			this->tieToolStripMenuItem->Text = L" &Tie channels";
+			this->tieToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::tieToolStripMenuItem_Click);
 			// 
 			// toolStripMenuItem4
 			// 
@@ -227,7 +231,7 @@ namespace LogsLiteViewerCLI
 				this->toolStripSeparator1, this->createChannelStripButton, this->manageChannelsButton});
 			this->MainToolbar->Location = System::Drawing::Point(0, 24);
 			this->MainToolbar->Name = L"MainToolbar";
-			this->MainToolbar->Size = System::Drawing::Size(494, 25);
+			this->MainToolbar->Size = System::Drawing::Size(694, 25);
 			this->MainToolbar->TabIndex = 2;
 			this->MainToolbar->Text = L"toolStrip1";
 			// 
@@ -277,12 +281,16 @@ namespace LogsLiteViewerCLI
 			this->NotifyIcon->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"NotifyIcon.Icon")));
 			this->NotifyIcon->Visible = true;
 			// 
+			// udpWorker
+			// 
+			this->udpWorker->DoWork += gcnew System::ComponentModel::DoWorkEventHandler(this, &LogViewerMainForm::udpWorker_DoWork);
+			// 
 			// LogViewerMainForm
 			// 
 			this->AccessibleName = L"";
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(494, 572);
+			this->ClientSize = System::Drawing::Size(694, 572);
 			this->Controls->Add(this->MainToolbar);
 			this->Controls->Add(this->MainTabs);
 			this->Controls->Add(this->MainMenu);
@@ -290,7 +298,7 @@ namespace LogsLiteViewerCLI
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->MainMenuStrip = this->MainMenu;
 			this->MaximizeBox = false;
-			this->MinimumSize = System::Drawing::Size(500, 600);
+			this->MinimumSize = System::Drawing::Size(700, 600);
 			this->Name = L"LogViewerMainForm";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"LogLiteViewer.CLI";
@@ -319,6 +327,9 @@ namespace LogsLiteViewerCLI
 		
 			// Create first channel.
 			CreateChannelLogic();	
+			
+			// Enable worker.
+			udpWorker->RunWorkerAsync();
 		}
 		
 	private:   
@@ -358,9 +369,62 @@ namespace LogsLiteViewerCLI
 		// Valid function, for adding data into ListBox from the same thread.
 		void AddFileChangeToListBox(ListBox^ lb, String^ item)
 		{
-			// Reading from file sent in item parameter, last change and last state.
-			// TODO - Reading files and changes.
-			lb->Items->Add(item);
+			try
+			{
+				// Reading from file sent in item parameter, last change and last state.
+				StreamReader^ f = gcnew StreamReader(item);
+			
+				String^ line = "";
+				List<String^>^ lines = gcnew List<String^>();
+				
+				while ((line = f->ReadLine()) != nullptr)
+				{
+					lines->Add(line);
+				}
+				f->Close();
+
+				line = lines[lines->Count - 1];
+				lb->Items->Add(line);							
+				
+				// Scroll down and notify.
+				lb->TopIndex = lb->Items->Count - 1;				
+				String^ name = "NewChannelListBox";					
+				Notify(line, Convert::ToInt32(lb->Name->Substring(name->Length)));			
+			} 
+			catch(...)
+			{}
+		}		
+		
+		// Valid function, for adding data into ListBox from the same thread - xml file.
+		void AddXmlFileChangeToListBox(ListBox^ lb, String^ item)
+		{
+			try
+			{
+				// Reading from file sent in item parameter, last change and last state.
+				StreamReader^ f = gcnew StreamReader(item);
+				
+				String^ line = "";
+				List<String^>^ lines = gcnew List<String^>();
+				
+				while ((line = f->ReadLine()) != nullptr)
+				{
+					lines->Add(line);
+				}
+				
+				f->Close();
+					
+				line = lines[lines->Count - 1];
+				
+				// TODO: Extracting data from XML	
+				lb->Items->Add(line);			
+				
+				// Scroll down and notify.
+				lb->TopIndex = lb->Items->Count - 1;				
+				String^ name = "NewChannelListBox";					
+				Notify(line, Convert::ToInt32(lb->Name->Substring(name->Length)));									
+			}
+			catch(...)
+			{}
 		}
 		
 	#pragma endregion
@@ -391,15 +455,24 @@ namespace LogsLiteViewerCLI
 		}		 				
 	
 	private:			 	
-		// FileSystemWatcher change event handler.
+		// FileSystemWatcher txt file change event handler.
 		System::Void FileSystemWatcher_Changed(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e) 
 		{				
 			// Decoding Tab and ListBox from index sent to the event.
 			int idx = e->TabIndex();
 			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];
-			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddFileChangeToListBox), control, e->Data());			
-			Notify(e->Data(), e->TabIndex());
+			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddFileChangeToListBox), control, e->Data());						
 		}		
+	
+	private:
+		// FileSystemWatcher xml file change event handler.
+		System::Void FileSystemWatcherXml_Changed(System::Object^  sender, LogViewer::Events::SimpleChangedDataEventArgs^  e) 
+		{				
+			// Decoding Tab and ListBox from index sent to the event.
+			int idx = e->TabIndex();
+			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];
+			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddXmlFileChangeToListBox), control, e->Data());						
+		}			
 		
 	private:
 		// Showing manage channels dialog.
@@ -459,8 +532,17 @@ namespace LogsLiteViewerCLI
 		{
 			// Joining new file input into active channel.			
 			if (FolderBrowserDialog->ShowDialog(this) == System::Windows::Forms::DialogResult::OK)
-			{				
-				InputWatcher::ProxyFileSystemDelegate^ eventHandler = gcnew InputWatcher::ProxyFileSystemDelegate(this, &LogViewerMainForm::FileSystemWatcher_Changed);
+			{		
+				InputWatcher::ProxyFileSystemDelegate^ eventHandler = nullptr;
+				if (ft == InputWatcher::FileType::FileType_Txt)
+				{
+					eventHandler = gcnew InputWatcher::ProxyFileSystemDelegate(this, &LogViewerMainForm::FileSystemWatcher_Changed);
+				}
+				else
+				{
+					eventHandler = gcnew InputWatcher::ProxyFileSystemDelegate(this, &LogViewerMainForm::FileSystemWatcherXml_Changed);
+				}
+				
 				channelsManager[MainTabs->TabIndex]->appendInput(gcnew Inputs::FileInput(FolderBrowserDialog->SelectedPath, ft, idx, eventHandler));
 			}
 		}			
@@ -514,7 +596,7 @@ namespace LogsLiteViewerCLI
 		}
 		
 	private: 
-		System::Void aToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+		System::Void tieToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 		{
 			// TODO
 		}
@@ -531,8 +613,29 @@ namespace LogsLiteViewerCLI
 		{
 			ShowManageChannelsDialog();
 		}
+									
+	private: 
+		System::Void udpWorker_DoWork(System::Object^  sender, System::ComponentModel::DoWorkEventArgs^  e) 
+		{
+			Inputs::NetworkInput^ ptr = nullptr;
 			
-	#pragma endregion						
+		    while (true)
+			{				
+				for(unsigned int i = 0; i < channelsManager->channelCount(); ++i)
+				{
+					for (unsigned int j = 0; j < channelsManager[i]->inputsCount(); ++j)
+					{					
+						if (channelsManager[i][j]->Type() == "NetworkInput")
+						{
+							ptr = static_cast<Inputs::NetworkInput^>(channelsManager[i][j]);					
+							ptr->receive();
+						}
+					}
+				}
+			}
+		}
+		
+	#pragma endregion	
 };
 
 }

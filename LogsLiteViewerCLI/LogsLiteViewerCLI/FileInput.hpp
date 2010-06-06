@@ -19,6 +19,11 @@ namespace Inputs
 			FileInput(String^ path, InputWatcher::FileType ft, unsigned int idx, InputWatcher::ProxyFileSystemDelegate^ eventHandler);
 			virtual ~FileInput() {}		
 			
+			virtual String^ Type() override  		 
+			{ 
+				return "FileInput"; 
+			}
+			
 		private:
 			unsigned int _tabIndex;
 		

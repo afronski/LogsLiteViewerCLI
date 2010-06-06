@@ -27,7 +27,7 @@ void InputWatcher::createNewWatcher(String^ path, InputWatcher::FileType ft, uns
 	_fileWatcher = gcnew FileSystemWatcher(path, filter);
 	_fileWatcher->Changed += _eventHandler;
 	_fileWatcher->EnableRaisingEvents = activateNow;
-	_fileWatcher->NotifyFilter = System::IO::NotifyFilters::Attributes | System::IO::NotifyFilters::LastAccess | System::IO::NotifyFilters::LastAccess;	
+	_fileWatcher->NotifyFilter = System::IO::NotifyFilters::LastWrite;	
 }			
 
 void InputWatcher::suspendWatcher()

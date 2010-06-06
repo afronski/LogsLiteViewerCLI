@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable:4947)
 
 using namespace System;
 using namespace System::Net;
@@ -14,17 +15,27 @@ namespace Inputs
 	public ref class NetworkInput : public InputInterface
 	{
 		public:
-			NetworkInput(String^ address, unsigned int port, unsigned int idx): _address(address), _port(port), _tabIndex(idx)
+			NetworkInput(String^ address, unsigned int port, unsigned int idx): 
+				_address(address), _port(port), _tabIndex(idx)
 			{
-				_udpClient = gcnew UdpClient();				
+				IPHostEntry^ entry = Dns::GetHostByName(_address);
+		
+				// IPEndPoint object will allow us to read datagrams sent from specified port and address.
+				_remoteIpEndPoint = gcnew IPEndPoint(entry->AddressList[0], _port);
+	
+				_listener = gcnew Socket(AddressFamily::InterNetwork, SocketType::Dgram, ProtocolType::Udp);
+				_listener->Bind(_remoteIpEndPoint);			
 			}			
 			
-			virtual ~NetworkInput() {}
-						
-			// TODO: Threads & OnReceived invoking.							
+			virtual ~NetworkInput() {}				
+			
+			virtual String^ Type() override			
+			{ 
+				return "NetworkInput"; 
+			}
 						
 			// Methods for receiving & sending bytes.
-			String^ receive();
+			void receive();
 			bool send(String^ toSend);
 			
 		public: 
@@ -38,8 +49,8 @@ namespace Inputs
 			unsigned int _port;	
 		
 			unsigned int _tabIndex;
-		
-			UdpClient^ _udpClient;
+								
+			Socket^ _listener;
 			IPEndPoint^ _remoteIpEndPoint;
 	};
 
