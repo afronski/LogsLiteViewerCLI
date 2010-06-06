@@ -1,8 +1,9 @@
 #pragma once
 
+#include "About.h"
+
 namespace LogsLiteViewerCLI 
 {
-
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -43,8 +44,8 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::ToolStripButton^  joinStripButton;
 	private: System::Windows::Forms::ToolStripButton^  createChannelStripButton;
 
-	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem;
-	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem1;
+
+
 	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem1;
 	private: System::Windows::Forms::ToolStripMenuItem^  joinToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem2;
@@ -58,6 +59,7 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::NotifyIcon^  NotifyIcon;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private: System::Windows::Forms::FolderBrowserDialog^  FolderBrowserDialog;
+	private: System::Windows::Forms::ToolStripButton^  manageChannelsButton;
 
 
 	private: System::ComponentModel::IContainer^  components;
@@ -91,8 +93,6 @@ namespace LogsLiteViewerCLI
 			this->toolStripMenuItem4 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->manageChannelsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->helpToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->toolStripMenuItem1 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->aboutToolStripMenuItem1 = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->MainToolbar = (gcnew System::Windows::Forms::ToolStrip());
 			this->joinStripButton = (gcnew System::Windows::Forms::ToolStripButton());
@@ -100,6 +100,7 @@ namespace LogsLiteViewerCLI
 			this->createChannelStripButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->NotifyIcon = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			this->FolderBrowserDialog = (gcnew System::Windows::Forms::FolderBrowserDialog());
+			this->manageChannelsButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->MainMenu->SuspendLayout();
 			this->MainToolbar->SuspendLayout();
 			this->SuspendLayout();
@@ -133,6 +134,7 @@ namespace LogsLiteViewerCLI
 			// 
 			// createChannelToolStripMenuItem
 			// 
+			this->createChannelToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"createChannelToolStripMenuItem.Image")));
 			this->createChannelToolStripMenuItem->Name = L"createChannelToolStripMenuItem";
 			this->createChannelToolStripMenuItem->Size = System::Drawing::Size(153, 22);
 			this->createChannelToolStripMenuItem->Text = L"&Create channel";
@@ -145,6 +147,7 @@ namespace LogsLiteViewerCLI
 			// 
 			// joinToolStripMenuItem
 			// 
+			this->joinToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"joinToolStripMenuItem.Image")));
 			this->joinToolStripMenuItem->Name = L"joinToolStripMenuItem";
 			this->joinToolStripMenuItem->Size = System::Drawing::Size(153, 22);
 			this->joinToolStripMenuItem->Text = L"&Join input";
@@ -172,12 +175,14 @@ namespace LogsLiteViewerCLI
 			// 
 			// splitChannelToolStripMenuItem
 			// 
+			this->splitChannelToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"splitChannelToolStripMenuItem.Image")));
 			this->splitChannelToolStripMenuItem->Name = L"splitChannelToolStripMenuItem";
 			this->splitChannelToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->splitChannelToolStripMenuItem->Text = L"&Split channel";
 			// 
 			// aToolStripMenuItem
 			// 
+			this->aToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"aToolStripMenuItem.Image")));
 			this->aToolStripMenuItem->Name = L"aToolStripMenuItem";
 			this->aToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->aToolStripMenuItem->Text = L" &Tie channels";
@@ -189,6 +194,7 @@ namespace LogsLiteViewerCLI
 			// 
 			// manageChannelsToolStripMenuItem
 			// 
+			this->manageChannelsToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"manageChannelsToolStripMenuItem.Image")));
 			this->manageChannelsToolStripMenuItem->Name = L"manageChannelsToolStripMenuItem";
 			this->manageChannelsToolStripMenuItem->Size = System::Drawing::Size(176, 22);
 			this->manageChannelsToolStripMenuItem->Text = L"&Manage channels...";
@@ -196,33 +202,23 @@ namespace LogsLiteViewerCLI
 			// helpToolStripMenuItem
 			// 
 			this->helpToolStripMenuItem->Alignment = System::Windows::Forms::ToolStripItemAlignment::Right;
-			this->helpToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {this->aboutToolStripMenuItem, 
-				this->toolStripMenuItem1, this->aboutToolStripMenuItem1});
+			this->helpToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->aboutToolStripMenuItem1});
 			this->helpToolStripMenuItem->Name = L"helpToolStripMenuItem";
 			this->helpToolStripMenuItem->Size = System::Drawing::Size(44, 20);
 			this->helpToolStripMenuItem->Text = L"&Help";
 			// 
-			// aboutToolStripMenuItem
-			// 
-			this->aboutToolStripMenuItem->Name = L"aboutToolStripMenuItem";
-			this->aboutToolStripMenuItem->Size = System::Drawing::Size(107, 22);
-			this->aboutToolStripMenuItem->Text = L"&Index";
-			// 
-			// toolStripMenuItem1
-			// 
-			this->toolStripMenuItem1->Name = L"toolStripMenuItem1";
-			this->toolStripMenuItem1->Size = System::Drawing::Size(104, 6);
-			// 
 			// aboutToolStripMenuItem1
 			// 
+			this->aboutToolStripMenuItem1->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"aboutToolStripMenuItem1.Image")));
 			this->aboutToolStripMenuItem1->Name = L"aboutToolStripMenuItem1";
-			this->aboutToolStripMenuItem1->Size = System::Drawing::Size(107, 22);
+			this->aboutToolStripMenuItem1->Size = System::Drawing::Size(152, 22);
 			this->aboutToolStripMenuItem1->Text = L"&About";
+			this->aboutToolStripMenuItem1->Click += gcnew System::EventHandler(this, &LogViewerMainForm::aboutToolStripMenuItem1_Click);
 			// 
 			// MainToolbar
 			// 
-			this->MainToolbar->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {this->joinStripButton, 
-				this->toolStripSeparator1, this->createChannelStripButton});
+			this->MainToolbar->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->joinStripButton, 
+				this->toolStripSeparator1, this->createChannelStripButton, this->manageChannelsButton});
 			this->MainToolbar->Location = System::Drawing::Point(0, 24);
 			this->MainToolbar->Name = L"MainToolbar";
 			this->MainToolbar->Size = System::Drawing::Size(494, 25);
@@ -260,6 +256,16 @@ namespace LogsLiteViewerCLI
 			// 
 			this->NotifyIcon->Visible = true;
 			// 
+			// manageChannelsButton
+			// 
+			this->manageChannelsButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Image;
+			this->manageChannelsButton->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"manageChannelsButton.Image")));
+			this->manageChannelsButton->ImageTransparentColor = System::Drawing::Color::Magenta;
+			this->manageChannelsButton->Name = L"manageChannelsButton";
+			this->manageChannelsButton->Size = System::Drawing::Size(23, 22);
+			this->manageChannelsButton->Text = L"manageChannelsButton";
+			this->manageChannelsButton->ToolTipText = L"Click to manage channels...";
+			// 
 			// LogViewerMainForm
 			// 
 			this->AccessibleName = L"";
@@ -270,11 +276,12 @@ namespace LogsLiteViewerCLI
 			this->Controls->Add(this->MainTabs);
 			this->Controls->Add(this->MainMenu);
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->MainMenuStrip = this->MainMenu;
 			this->MaximizeBox = false;
 			this->MinimumSize = System::Drawing::Size(500, 600);
 			this->Name = L"LogViewerMainForm";
-			this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"LogLiteViewer.CLI";
 			this->Load += gcnew System::EventHandler(this, &LogViewerMainForm::LogViewerMainForm_Load);
 			this->MainMenu->ResumeLayout(false);
@@ -440,8 +447,15 @@ namespace LogsLiteViewerCLI
 			// Closing form.
 			Close();	
 		}			
-			 
-	#pragma endregion		 		 
+			 		 		 
+	private: 
+		System::Void aboutToolStripMenuItem1_Click(System::Object^  sender, System::EventArgs^  e) 
+		{					
+			About^ AboutWindow = gcnew About();
+			AboutWindow->Show(this);
+		}
+		
+	#pragma endregion			
 };
 
 }

@@ -15,7 +15,7 @@ namespace Inputs
 			InputInterface(): _name("") {}
 			InputInterface(String^ name): _name(name) {}						
 			
-			virtual ~InputInterface() {}
+			virtual ~InputInterface() {}						
 			
 			// Public accessor.
 			String^% Name()
