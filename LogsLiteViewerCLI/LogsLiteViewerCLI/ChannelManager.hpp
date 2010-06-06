@@ -38,7 +38,7 @@ namespace Logic
 				}
 				
 				return iter;
-			}
+			}			
 			
 		private:
 			List<Channel^>^ _channels;

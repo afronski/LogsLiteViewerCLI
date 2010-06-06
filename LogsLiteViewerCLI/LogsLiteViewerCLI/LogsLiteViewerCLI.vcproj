@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ManageChannelsDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\NetworkInput.cpp"
 				>
 			</File>
@@ -310,6 +314,15 @@
 				<File
 					RelativePath=".\LogViewerMainForm.resX"
 					SubType="Designer"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\ManageChannelsDialog.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\ManageChannelsDialog.resx"
 					>
 				</File>
 			</File>

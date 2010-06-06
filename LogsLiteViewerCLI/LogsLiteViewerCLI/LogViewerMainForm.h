@@ -3,6 +3,7 @@
 #include "About.h"
 #include "InputTypeDialog.h"
 #include "UdpPropertiesDialog.h"
+#include "ManageChannelsDialog.h"
 
 namespace LogsLiteViewerCLI 
 {
@@ -404,7 +405,12 @@ namespace LogsLiteViewerCLI
 		// Showing manage channels dialog.
 		System::Void ShowManageChannelsDialog()
 		{
-			// TODO
+			ManageChannelsDialog^ window = gcnew ManageChannelsDialog();
+			window->channelsManagerRef() = channelsManager;
+			
+			window->ShowDialog(this);
+			
+			// TODO: Fill tabs again.
 		}		
 		
 	private:	
