@@ -14,7 +14,7 @@ void ChannelManager::appendChannel(Channel^ toAppend)
 
 void ChannelManager::removeChannel(String^ nameToDelete)
 {	
-	Channel^ iter;
+	Channel^ iter = nullptr;
 	for each(Channel^ chan in _channels)
 	{
 		if (chan->Name() == nameToDelete)
@@ -24,5 +24,8 @@ void ChannelManager::removeChannel(String^ nameToDelete)
 		}
 	}
 	
-	_channels->Remove(iter);
+	if (iter)
+	{
+		_channels->Remove(iter);
+	}
 }

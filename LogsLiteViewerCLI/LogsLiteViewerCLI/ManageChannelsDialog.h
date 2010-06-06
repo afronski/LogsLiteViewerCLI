@@ -38,11 +38,8 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::Button^  btnDelete;
 
 
-	private: System::Windows::Forms::Label^  lbName;
-
-
-
-	protected: 
+	private: System::Windows::Forms::Label^  lbName;	
+	private: System::Windows::Forms::ListBox^  listInputs;
 
 
 	private:
@@ -59,11 +56,12 @@ namespace LogsLiteViewerCLI
 			this->btnRename = (gcnew System::Windows::Forms::Button());
 			this->btnDelete = (gcnew System::Windows::Forms::Button());
 			this->lbName = (gcnew System::Windows::Forms::Label());
+			this->listInputs = (gcnew System::Windows::Forms::ListBox());
 			this->SuspendLayout();
 			// 
 			// btnOk
 			// 
-			this->btnOk->Location = System::Drawing::Point(374, 97);
+			this->btnOk->Location = System::Drawing::Point(374, 193);
 			this->btnOk->Name = L"btnOk";
 			this->btnOk->Size = System::Drawing::Size(88, 23);
 			this->btnOk->TabIndex = 0;
@@ -76,20 +74,20 @@ namespace LogsLiteViewerCLI
 			this->listChannels->FormattingEnabled = true;
 			this->listChannels->Location = System::Drawing::Point(12, 12);
 			this->listChannels->Name = L"listChannels";
-			this->listChannels->Size = System::Drawing::Size(202, 108);
+			this->listChannels->Size = System::Drawing::Size(165, 173);
 			this->listChannels->TabIndex = 1;
 			this->listChannels->SelectedIndexChanged += gcnew System::EventHandler(this, &ManageChannelsDialog::listChannels_SelectedIndexChanged);
 			// 
 			// tbName
 			// 
-			this->tbName->Location = System::Drawing::Point(268, 9);
+			this->tbName->Location = System::Drawing::Point(227, 12);
 			this->tbName->Name = L"tbName";
-			this->tbName->Size = System::Drawing::Size(194, 20);
+			this->tbName->Size = System::Drawing::Size(235, 20);
 			this->tbName->TabIndex = 2;
 			// 
 			// btnRename
 			// 
-			this->btnRename->Location = System::Drawing::Point(268, 38);
+			this->btnRename->Location = System::Drawing::Point(227, 38);
 			this->btnRename->Name = L"btnRename";
 			this->btnRename->Size = System::Drawing::Size(84, 23);
 			this->btnRename->TabIndex = 3;
@@ -110,17 +108,26 @@ namespace LogsLiteViewerCLI
 			// lbName
 			// 
 			this->lbName->AutoSize = true;
-			this->lbName->Location = System::Drawing::Point(227, 12);
+			this->lbName->Location = System::Drawing::Point(183, 15);
 			this->lbName->Name = L"lbName";
 			this->lbName->Size = System::Drawing::Size(38, 13);
 			this->lbName->TabIndex = 5;
 			this->lbName->Text = L"Name:";
 			// 
+			// listInputs
+			// 
+			this->listInputs->FormattingEnabled = true;
+			this->listInputs->Location = System::Drawing::Point(183, 64);
+			this->listInputs->Name = L"listInputs";
+			this->listInputs->Size = System::Drawing::Size(279, 121);
+			this->listInputs->TabIndex = 6;
+			// 
 			// ManageChannelsDialog
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(474, 132);
+			this->ClientSize = System::Drawing::Size(474, 228);
+			this->Controls->Add(this->listInputs);
 			this->Controls->Add(this->lbName);
 			this->Controls->Add(this->btnDelete);
 			this->Controls->Add(this->btnRename);
@@ -139,6 +146,12 @@ namespace LogsLiteViewerCLI
 			this->PerformLayout();
 
 		}
+
+	public:
+		delegate System::Void EraseTabDelegateType(int idx, System::String^ name);
+	
+	public:
+		event EraseTabDelegateType^ EraseTabEvent;
 		
 	private:
 		void LoadChannels()
@@ -181,6 +194,12 @@ namespace LogsLiteViewerCLI
 			if (listChannels->SelectedIndex != -1 && listChannels->SelectedIndex < static_cast<int>(_channels->channelCount()))
 			{
 				tbName->Text = _channels[listChannels->SelectedIndex]->Name();
+				
+				listInputs->Items->Clear();
+				for(unsigned int i = 0; i < _channels[listChannels->SelectedIndex]->inputsCount(); ++i)
+				{
+					listInputs->Items->Add(_channels[listChannels->SelectedIndex][i]->Name());
+				}
 			}
 		}
 								
@@ -206,7 +225,7 @@ namespace LogsLiteViewerCLI
 		{
 			if (listChannels->SelectedIndex != -1 && listChannels->SelectedIndex < static_cast<int>(_channels->channelCount()))
 			{
-				_channels->removeChannel(_channels[listChannels->SelectedIndex]->Name());
+				EraseTabEvent(listChannels->SelectedIndex, _channels[listChannels->SelectedIndex]->Name());
 			}		
 			
 			LoadChannels();

@@ -55,10 +55,10 @@ namespace LogsLiteViewerCLI
 	private: System::Windows::Forms::ToolStripMenuItem^  exitToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  createChannelToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem3;
-	private: System::Windows::Forms::ToolStripMenuItem^  splitChannelToolStripMenuItem;
-	private: System::Windows::Forms::ToolStripMenuItem^  tieToolStripMenuItem;
 
-	private: System::Windows::Forms::ToolStripSeparator^  toolStripMenuItem4;
+
+
+
 	private: System::Windows::Forms::ToolStripMenuItem^  manageChannelsToolStripMenuItem;
 	private: System::Windows::Forms::NotifyIcon^  NotifyIcon;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
@@ -94,9 +94,6 @@ namespace LogsLiteViewerCLI
 			this->toolStripMenuItem2 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->editToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->splitChannelToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->tieToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->toolStripMenuItem4 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->manageChannelsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->helpToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem1 = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -174,32 +171,10 @@ namespace LogsLiteViewerCLI
 			// 
 			// editToolStripMenuItem
 			// 
-			this->editToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->splitChannelToolStripMenuItem, 
-				this->tieToolStripMenuItem, this->toolStripMenuItem4, this->manageChannelsToolStripMenuItem});
+			this->editToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->manageChannelsToolStripMenuItem});
 			this->editToolStripMenuItem->Name = L"editToolStripMenuItem";
 			this->editToolStripMenuItem->Size = System::Drawing::Size(39, 20);
 			this->editToolStripMenuItem->Text = L"&Edit";
-			// 
-			// splitChannelToolStripMenuItem
-			// 
-			this->splitChannelToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"splitChannelToolStripMenuItem.Image")));
-			this->splitChannelToolStripMenuItem->Name = L"splitChannelToolStripMenuItem";
-			this->splitChannelToolStripMenuItem->Size = System::Drawing::Size(176, 22);
-			this->splitChannelToolStripMenuItem->Text = L"&Split channel";
-			this->splitChannelToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::splitChannelToolStripMenuItem_Click);
-			// 
-			// tieToolStripMenuItem
-			// 
-			this->tieToolStripMenuItem->Image = (cli::safe_cast<System::Drawing::Image^  >(resources->GetObject(L"tieToolStripMenuItem.Image")));
-			this->tieToolStripMenuItem->Name = L"tieToolStripMenuItem";
-			this->tieToolStripMenuItem->Size = System::Drawing::Size(176, 22);
-			this->tieToolStripMenuItem->Text = L" &Tie channels";
-			this->tieToolStripMenuItem->Click += gcnew System::EventHandler(this, &LogViewerMainForm::tieToolStripMenuItem_Click);
-			// 
-			// toolStripMenuItem4
-			// 
-			this->toolStripMenuItem4->Name = L"toolStripMenuItem4";
-			this->toolStripMenuItem4->Size = System::Drawing::Size(173, 6);
 			// 
 			// manageChannelsToolStripMenuItem
 			// 
@@ -416,7 +391,18 @@ namespace LogsLiteViewerCLI
 					
 				line = lines[lines->Count - 1];
 				
-				// TODO: Extracting data from XML	
+				// Removing namespaces.
+				line = line->Replace("log4j:", "");
+				
+				// Extracting data from XML string.
+				Xml::XmlDocument^ doc = gcnew Xml::XmlDocument();
+				doc->LoadXml(line);
+				
+				Xml::XmlNodeList^ attr = doc->GetElementsByTagName("event");
+				Xml::XmlNodeList^ list = doc->GetElementsByTagName("message");				
+				
+				line = String::Format("{2} {1}: {0}", list[0]->InnerText, attr[0]->Attributes["thread"]->Value, attr[0]->Attributes["timestamp"]->Value);
+				
 				lb->Items->Add(line);			
 				
 				// Scroll down and notify.
@@ -476,15 +462,42 @@ namespace LogsLiteViewerCLI
 		}			
 		
 	private:
+		// Erase tab handler.
+		System::Void EraseTabHandler(int idx, System::String^ name)
+		{
+			MainTabs->TabPages->RemoveAt(idx);
+			channelsManager->removeChannel(name);
+			
+			// Rename all pages.
+			for(int i = idx; i < MainTabs->TabPages->Count; ++i)
+			{
+				MainTabs->TabPages[i]->Name = String::Format("NewChannelTab{0}", i);
+				MainTabs->TabPages[i]->Controls[String::Format("NewChannelListBox{0}", i + 1)]->Name = String::Format("NewChannelListBox{0}", i);
+			}
+		}
+		
+	private:
 		// Showing manage channels dialog.
 		System::Void ShowManageChannelsDialog()
 		{
 			ManageChannelsDialog^ window = gcnew ManageChannelsDialog();
 			window->channelsManagerRef() = channelsManager;
 			
-			window->ShowDialog(this);
+			ManageChannelsDialog::EraseTabDelegateType^ handler = gcnew ManageChannelsDialog::EraseTabDelegateType(this, &LogViewerMainForm::EraseTabHandler);
+			window->EraseTabEvent += handler;
+			window->ShowDialog(this);			
+									
+			// Rename tabs.
+			for(unsigned int i = 0; i < channelsManager->channelCount(); ++i)
+			{
+				if (MainTabs->TabPages[i]->Text != channelsManager[i]->Name())
+				{
+					MainTabs->TabPages[i]->Text = channelsManager[i]->Name();
+				}				
+			}
 			
-			// TODO: Fill tabs again.
+			// Cleaning up.
+			window->EraseTabEvent -= handler;
 		}		
 		
 	private:	
@@ -589,18 +602,6 @@ namespace LogsLiteViewerCLI
 			About^ AboutWindow = gcnew About();
 			AboutWindow->Show(this);
 		}
-			
-	private: 
-		System::Void splitChannelToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-		{
-			// TODO
-		}
-		
-	private: 
-		System::Void tieToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-		{
-			// TODO
-		}
 		
 		
 	private: 
@@ -622,17 +623,21 @@ namespace LogsLiteViewerCLI
 			
 		    while (true)
 			{				
-				for(unsigned int i = 0; i < channelsManager->channelCount(); ++i)
+				try
 				{
-					for (unsigned int j = 0; j < channelsManager[i]->inputsCount(); ++j)
-					{					
-						if (channelsManager[i][j]->Type() == "NetworkInput")
-						{
-							ptr = static_cast<Inputs::NetworkInput^>(channelsManager[i][j]);					
-							ptr->receive();
+					for(unsigned int i = 0; i < channelsManager->channelCount(); ++i)
+					{
+						for (unsigned int j = 0; j < channelsManager[i]->inputsCount(); ++j)
+						{					
+							if (channelsManager[i][j]->Type() == "NetworkInput")
+							{
+								ptr = static_cast<Inputs::NetworkInput^>(channelsManager[i][j]);					
+								ptr->receive();
+							}
 						}
 					}
 				}
+				catch(...) {}
 			}
 		}
 		

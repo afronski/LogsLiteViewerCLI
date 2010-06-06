@@ -15,7 +15,7 @@ void Channel::appendInput(Inputs::InputInterface^ in)
 
 void Channel::removeInput(String^ name)
 {
-	Inputs::InputInterface^ iter;
+	Inputs::InputInterface^ iter = nullptr;
 	for each(Inputs::InputInterface^ i in _inputs)
 	{
 		if (i->Name() == name)
@@ -25,5 +25,8 @@ void Channel::removeInput(String^ name)
 		}			
 	}
 	
-	_inputs->Remove(iter);
+	if (iter)
+	{
+		_inputs->Remove(iter);
+	}
 }

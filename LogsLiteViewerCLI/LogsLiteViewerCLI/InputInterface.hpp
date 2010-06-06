@@ -11,8 +11,7 @@ namespace Inputs
 
 	public ref class InputInterface abstract
 	{
-		public:
-			InputInterface(): _name("") {}
+		public:			
 			InputInterface(String^ name): _name(name) {}						
 			
 			virtual ~InputInterface() {}						

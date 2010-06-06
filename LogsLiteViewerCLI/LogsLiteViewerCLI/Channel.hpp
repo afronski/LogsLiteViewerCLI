@@ -35,7 +35,7 @@ namespace Logic
 			Inputs::InputInterface^ operator[] (int idx)	{ return _inputs[idx]; }
 			Inputs::InputInterface^ operator[] (String^ name)	
 			{ 
-				Inputs::InputInterface^ iter;
+				Inputs::InputInterface^ iter = nullptr;
 				for each(Inputs::InputInterface^ i in _inputs)
 				{
 					if (i->Name() == name)

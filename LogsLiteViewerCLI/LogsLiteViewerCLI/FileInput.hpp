@@ -15,7 +15,6 @@ namespace Inputs
 	public ref class FileInput : public InputInterface
 	{
 		public:
-			FileInput();
 			FileInput(String^ path, InputWatcher::FileType ft, unsigned int idx, InputWatcher::ProxyFileSystemDelegate^ eventHandler);
 			virtual ~FileInput() {}		
 			

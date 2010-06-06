@@ -27,7 +27,7 @@ namespace Logic
 			Channel^ operator[] (int idx)	{ return _channels[idx]; }
 			Channel^ operator[] (String^ name)	
 			{ 
-				Channel^ iter;
+				Channel^ iter = nullptr;
 				for each(Channel^ chan in _channels)
 				{
 					if (chan->Name() == name)

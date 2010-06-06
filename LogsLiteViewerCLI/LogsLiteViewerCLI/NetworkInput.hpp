@@ -16,7 +16,7 @@ namespace Inputs
 	{
 		public:
 			NetworkInput(String^ address, unsigned int port, unsigned int idx): 
-				_address(address), _port(port), _tabIndex(idx)
+				_address(address), _port(port), _tabIndex(idx), InputInterface(String::Format("{0}:{1}", address, port))
 			{
 				IPHostEntry^ entry = Dns::GetHostByName(_address);
 		
@@ -25,9 +25,12 @@ namespace Inputs
 	
 				_listener = gcnew Socket(AddressFamily::InterNetwork, SocketType::Dgram, ProtocolType::Udp);
 				_listener->Bind(_remoteIpEndPoint);			
-			}			
+			}									
 			
-			virtual ~NetworkInput() {}				
+			virtual ~NetworkInput() 
+			{
+				_listener->Close();
+			}				
 			
 			virtual String^ Type() override			
 			{ 
