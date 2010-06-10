@@ -1,5 +1,19 @@
 #pragma once
 
+/*	
+	rstaros@polsl.pl
+
+	Sprawozdanie (przys³aæ mail + kod Ÿród³owy + kompilacje):
+		- temat
+		- analiza tematu (decyzje dot. pracy i wymagañ)
+		- spec. wewnêtrzna (klasy - opis i znaczenie, istotne metody i pola)
+			- diagram klas (VS diagrams)	
+			- struktury danych i algorytmy (dzia³anie programu)
+		- spec. zewnêtrzna - instrukcja dla u¿ytkownika
+		- testowanie i uruchamianie (testowanie, b³êdy usuniête i wykryte)
+		- uwagi (nieobowi¹zkowe)							
+//*/
+
 #include "About.h"
 #include "InputTypeDialog.h"
 #include "UdpPropertiesDialog.h"
@@ -437,8 +451,11 @@ namespace LogsLiteViewerCLI
 			// Decoding Tab and ListBox from index sent to the event.
 			int idx = e->TabIndex();	
 			ListBox^ control = (ListBox^)this->MainTabs->TabPages[idx]->Controls[String::Format("NewChannelListBox{0}", idx)];	
-			this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddValueToListBox), control, e->Data());
-			Notify(e->Data(), e->TabIndex());
+			if (control != nullptr)
+			{			
+				this->Invoke(gcnew DelegateAddItemToListBox(this, &LogViewerMainForm::AddValueToListBox), control, e->Data());
+				Notify(e->Data(), e->TabIndex());
+			}
 		}		 				
 	
 	private:			 	
@@ -536,9 +553,10 @@ namespace LogsLiteViewerCLI
 		{
 			// Adding new input into channels manager.			
 			Inputs::NetworkInput^ networkInput = gcnew Inputs::NetworkInput(address, port, idx);
-			networkInput->OnReceived += gcnew Inputs::NetworkInput::ReceivedDelegate(this, &LogViewerMainForm::UDPData_Received);
+			Inputs::NetworkInput::ReceivedDelegate^ eventHandler = gcnew Inputs::NetworkInput::ReceivedDelegate(this, &LogViewerMainForm::UDPData_Received);
+			networkInput->OnReceived += eventHandler;			
 			
-			channelsManager[MainTabs->TabIndex]->appendInput(networkInput);
+			channelsManager[MainTabs->SelectedIndex]->appendInput(networkInput);
 		}
 	
 	private:			
@@ -631,8 +649,11 @@ namespace LogsLiteViewerCLI
 						{					
 							if (channelsManager[i][j]->Type() == "NetworkInput")
 							{
-								ptr = static_cast<Inputs::NetworkInput^>(channelsManager[i][j]);					
-								ptr->receive();
+								ptr = static_cast<Inputs::NetworkInput^>(channelsManager[i][j]);																					
+								if (ptr != nullptr)
+								{
+									ptr->receive();
+								}
 							}
 						}
 					}

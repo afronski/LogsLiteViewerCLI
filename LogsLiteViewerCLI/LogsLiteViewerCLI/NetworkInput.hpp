@@ -29,7 +29,7 @@ namespace Inputs
 			
 			virtual ~NetworkInput() 
 			{
-				_listener->Close();
+				_listener->Close();				
 			}				
 			
 			virtual String^ Type() override			

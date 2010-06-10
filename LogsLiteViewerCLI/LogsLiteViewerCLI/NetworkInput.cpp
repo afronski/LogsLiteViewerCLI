@@ -17,6 +17,7 @@ void NetworkInput::receive()
 		String^ returnData = Encoding::ASCII->GetString(receiveBytes, 0, count);
 				
 		LogViewer::Events::SimpleChangedDataEventArgs^ simple = gcnew LogViewer::Events::SimpleChangedDataEventArgs(_tabIndex, returnData);
+		
 		OnReceived(this, simple);
 	}
 	catch(SocketException^ e)

@@ -225,6 +225,7 @@ namespace LogsLiteViewerCLI
 		{
 			if (listChannels->SelectedIndex != -1 && listChannels->SelectedIndex < static_cast<int>(_channels->channelCount()))
 			{
+				tbName->Text = "";
 				EraseTabEvent(listChannels->SelectedIndex, _channels[listChannels->SelectedIndex]->Name());
 			}		
 			

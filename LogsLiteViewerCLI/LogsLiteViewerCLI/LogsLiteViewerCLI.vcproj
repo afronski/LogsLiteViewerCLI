@@ -362,6 +362,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\LogLiteViewer.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
