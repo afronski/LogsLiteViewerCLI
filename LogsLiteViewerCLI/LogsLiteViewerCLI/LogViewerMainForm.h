@@ -1,19 +1,5 @@
 #pragma once
 
-/*	
-	rstaros@polsl.pl
-
-	Sprawozdanie (przys³aæ mail + kod Ÿród³owy + kompilacje):
-		- temat
-		- analiza tematu (decyzje dot. pracy i wymagañ)
-		- spec. wewnêtrzna (klasy - opis i znaczenie, istotne metody i pola)
-			- diagram klas (VS diagrams)	
-			- struktury danych i algorytmy (dzia³anie programu)
-		- spec. zewnêtrzna - instrukcja dla u¿ytkownika
-		- testowanie i uruchamianie (testowanie, b³êdy usuniête i wykryte)
-		- uwagi (nieobowi¹zkowe)							
-//*/
-
 #include "About.h"
 #include "InputTypeDialog.h"
 #include "UdpPropertiesDialog.h"
