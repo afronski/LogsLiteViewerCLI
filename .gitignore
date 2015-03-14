@@ -1,0 +1,13 @@
+*.docx
+*.exe
+*.dll
+
+project/*.suo
+project/*.ncb
+
+project/Debug/
+project/Release/
+
+project/LogsLiteViewerCLI/Debug/
+project/LogsLiteViewerCLI/Release/
+project/LogsLiteViewerCLI/*.user
